@@ -2,6 +2,9 @@ pipeline {
     agent any
     environment {
         BUILD_COMPLETE = false
+        MAVEN_HOME = "/usr/local/Cellar/maven/3.8.2/libexec"
+        PATH = "$PATH:/usr/local/Cellar/maven/3.8.2/libexec/bin"
+        JAVA_HOME = "/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home"
     }
     stages {
         stage('Build') {
@@ -10,9 +13,13 @@ pipeline {
                 stage('Building') {
                     steps {
                         
-                        sh "mvn clean install  |  tee output.log"
+                        //sh 'export MAVEN_HOME=/usr/local/Cellar/maven/3.8.2/libexec'
+                        //sh 'export PATH=$PATH:/usr/local/Cellar/maven/3.8.2/libexec/bin'
+                        //sh 'mvn --version'
+                        //sh 'mvn clean package'
+                        sh "mvn clean package  |  tee output.log"
 
-                        sh '! grep "WARNING" output.log'
+                        sh '! grep "build is platform dependent!!" output.log'
 
                         script {
                             BUILD_COMPLETE = true
@@ -23,7 +30,7 @@ pipeline {
                     steps {
                         script {
                             while (BUILD_COMPLETE != true) {
-                                sh '! grep "WARNING" output.log'
+                                sh '! grep "build is platform dependent!!" output.log'
                             }
                         }
                     }
